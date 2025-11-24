@@ -17,8 +17,8 @@ html, body {
 }
 .counter {
   position: absolute;
-  top: 36%;
-  left: 51.5%;
+  top: 30%;
+  left: 21.5%;
   transform: translate(-50%, -50%);
   display: flex;
   gap: 3.3vw;
