@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Days Since Last Accident</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <meta name="theme-color" content="#f5d76e" />
+</head>
+<body>
+  <div class="background">
+    <div class="counter" aria-live="polite" aria-label="Days since last accident">
+      <span id="digit1" class="digit">0</span>
+      <span id="digit2" class="digit">0</span>
+      <span id="digit3" class="digit">0</span>
+    </div>
+    <div class="label" id="labelText">0 DAYS SINCE LAST ACCIDENT</div>
+
+    <div class="controls">
+      <button id="resetBtn" class="btn">Reset to Now</button>
+      <span id="status" class="status"></span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
