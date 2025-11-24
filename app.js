@@ -1,12 +1,26 @@
-const INITIAL_LAST_ACCIDENT_ISO = "2025-11-20T00:00:00Z";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBfqqXgrLGaRzY3ECH0FkckuSWlMgRgAWQ",
+  authDomain: "shanklin-5d9d8.firebaseapp.com",
+  projectId: "shanklin-5d9d8",
+  storageBucket: "shanklin-5d9d8.firebasestorage.app",
+  messagingSenderId: "294015099276",
+  appId: "1:294015099276:web:5c91556f85d46c310df6a9"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const d1 = document.getElementById("digit1");
 const d2 = document.getElementById("digit2");
 const d3 = document.getElementById("digit3");
 const labelText = document.getElementById("labelText");
 const resetBtn = document.getElementById("resetBtn");
 const statusEl = document.getElementById("status");
-
-const LS_KEY = "lastAccidentISO";
 
 function daysBetween(fromISO, to = new Date()) {
   const from = new Date(fromISO);
@@ -22,23 +36,39 @@ function showDays(days) {
   labelText.textContent = `${days} DAYS SINCE LAST ACCIDENT`;
 }
 
-function readLocal() {
-  return localStorage.getItem(LS_KEY) || INITIAL_LAST_ACCIDENT_ISO;
-}
-function writeLocal(iso) {
-  localStorage.setItem(LS_KEY, iso);
-  statusEl.textContent = "Saved locally.";
+async function getLastAccident() {
+  const ref = doc(db, "settings", "lastAccident");
+  const snap = await getDoc(ref);
+  if (snap.exists()) return snap.data().timestamp;
+  return null;
 }
 
-function start() {
-  let lastISO = readLocal();
+async function setLastAccident(date) {
+  const ref = doc(db, "settings", "lastAccident");
+  await setDoc(ref, { timestamp: date.toISOString() });
+}
+
+async function start() {
+  let lastISO = await getLastAccident();
+  if (!lastISO) {
+    const now = new Date().toISOString();
+    await setLastAccident(new Date(now));
+    lastISO = now;
+  }
+
   showDays(daysBetween(lastISO));
-  setInterval(() => showDays(daysBetween(lastISO)), 60000);
-  resetBtn.addEventListener("click", () => {
-    const nowISO = new Date().toISOString();
-    writeLocal(nowISO);
-    lastISO = nowISO;
-    showDays(daysBetween(lastISO));
+
+  // Refresh display every minute with latest data
+  setInterval(async () => {
+    const updated = await getLastAccident();
+    showDays(daysBetween(updated));
+  }, 60000);
+
+  resetBtn.addEventListener("click", async () => {
+    const now = new Date();
+    await setLastAccident(now);
+    showDays(daysBetween(now.toISOString()));
   });
 }
+
 start();
