@@ -1,6 +1,6 @@
 {
-  "name": "Days Since Last Accident",
-  "short_name": "Accident Timer",
+  "name": "Shank-O-Meter",
+  "short_name": "Shank-O-Meter",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#56605e",

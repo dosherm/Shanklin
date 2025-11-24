@@ -1,4 +1,4 @@
-const CACHE = "accident-timer-inline-v1";
+const CACHE = "shanklin-pwa-modal-v1";
 const ASSETS = [
   "./",
   "./index.html",
