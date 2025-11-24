@@ -18,18 +18,21 @@ html, body {
 
 .counter {
   position: absolute;
-  top: 28%;
-  left: 52%;
-  transform: translateX(-50%);
+  top: 35%;      /* adjust vertical placement */
+  left: 61%;     /* adjust horizontal placement */
+  transform: translate(-50%, -50%);
   display: flex;
-  gap: 0.4rem;
+  gap: 1.6vw;    /* spacing between digits */
 }
+
 .digit {
-  font-size: clamp(48px, 8vw, 120px);
+  font-size: clamp(64px, 10vw, 160px);
   font-weight: 900;
   line-height: 1;
-  text-shadow: 0 2px 0 rgba(0,0,0,0.25);
+  color: #576762;          /* new color */
+  text-shadow: none;       /* remove yellow glow */
 }
+
 .label {
   position: absolute;
   bottom: 16%;
