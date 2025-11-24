@@ -1,4 +1,4 @@
-const CACHE = "shanklin-pwa-modal-v1";
+const CACHE = "shanklin-pwa-msg-v1";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,7 +6,8 @@ const ASSETS = [
   "./app.js",
   "./manifest.json",
   "./icon-192.png",
-  "./icon-512.png"
+  "./icon-512.png",
+  "./firebase-messaging-sw.js"
 ];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
