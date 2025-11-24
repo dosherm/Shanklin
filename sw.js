@@ -1,11 +1,10 @@
-const CACHE = "accident-timer-v1";
+const CACHE = "accident-timer-inline-v1";
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./app.js",
   "./manifest.json",
-  "./days_since_background.svg",
   "./icon-192.png",
   "./icon-512.png"
 ];

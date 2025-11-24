@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBfqqXgrLGaRzY3ECH0FkckuSWlMgRgAWQ",
   authDomain: "shanklin-5d9d8.firebaseapp.com",
@@ -11,14 +10,13 @@ const firebaseConfig = {
   appId: "1:294015099276:web:5c91556f85d46c310df6a9"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const d1 = document.getElementById("digit1");
 const d2 = document.getElementById("digit2");
 const d3 = document.getElementById("digit3");
-const labelText = document.getElementById("labelText");
+const labelTextSVG = document.getElementById("labelTextSVG");
 const resetBtn = document.getElementById("resetBtn");
 const statusEl = document.getElementById("status");
 
@@ -28,12 +26,12 @@ function daysBetween(fromISO, to = new Date()) {
   return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
 }
 
-function showDays(days) {
+function renderDays(days) {
   const digits = days.toString().padStart(3, "0").slice(-3);
   d1.textContent = digits[0];
   d2.textContent = digits[1];
   d3.textContent = digits[2];
-  labelText.textContent = `${days} DAYS SINCE LAST ACCIDENT`;
+  labelTextSVG.textContent = `${days} DAYS SINCE LAST ACCIDENT`;
 }
 
 async function getLastAccident() {
@@ -55,19 +53,19 @@ async function start() {
     await setLastAccident(new Date(now));
     lastISO = now;
   }
+  renderDays(daysBetween(lastISO));
 
-  showDays(daysBetween(lastISO));
-
-  // Refresh display every minute with latest data
   setInterval(async () => {
     const updated = await getLastAccident();
-    showDays(daysBetween(updated));
+    renderDays(daysBetween(updated));
   }, 60000);
 
   resetBtn.addEventListener("click", async () => {
     const now = new Date();
     await setLastAccident(now);
-    showDays(daysBetween(now.toISOString()));
+    renderDays(daysBetween(now.toISOString()));
+    statusEl.textContent = "Updated.";
+    setTimeout(() => (statusEl.textContent = ""), 1500);
   });
 }
 
