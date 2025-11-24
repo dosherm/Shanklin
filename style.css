@@ -15,24 +15,20 @@ html, body {
   background-position: center center;
   background-size: cover;
 }
-
 .counter {
   position: absolute;
-  top: 35%;      /* adjust vertical placement */
-  left: 61%;     /* adjust horizontal placement */
+  top: 39%;
+  left: 61.5%;
   transform: translate(-50%, -50%);
   display: flex;
-  gap: 1.6vw;    /* spacing between digits */
+  gap: 1.3vw;
 }
-
 .digit {
-  font-size: clamp(64px, 10vw, 160px);
+  font-size: clamp(72px, 11vw, 170px);
   font-weight: 900;
   line-height: 1;
-  color: #576762;          /* new color */
-  text-shadow: none;       /* remove yellow glow */
+  color: #576762;
 }
-
 .label {
   position: absolute;
   bottom: 16%;

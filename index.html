@@ -10,25 +10,21 @@
 </head>
 <body>
   <div class="background">
-    <div class="counter" aria-live="polite" aria-label="Days since last accident">
+    <div class="counter">
       <span id="digit1" class="digit">0</span>
       <span id="digit2" class="digit">0</span>
       <span id="digit3" class="digit">0</span>
     </div>
     <div class="label" id="labelText">0 DAYS SINCE LAST ACCIDENT</div>
-
     <div class="controls">
       <button id="resetBtn" class="btn">Reset to Now</button>
       <span id="status" class="status"></span>
     </div>
   </div>
-
   <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js');
-      });
+      navigator.serviceWorker.register('./sw.js');
     }
   </script>
 </body>
