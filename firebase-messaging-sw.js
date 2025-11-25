@@ -1,5 +1,5 @@
-importScripts("https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging-compat.js");
+importScripts('https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
   apiKey: "AIzaSyBfqqXgrLGaRzY3ECH0FkckuSWlMgRgAWQ",
@@ -12,13 +12,12 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Background message handler
-messaging.onBackgroundMessage((payload) => {
-  const title = (payload.notification && payload.notification.title) || "Shank‑O‑Meter Update";
-  const options = {
-    body: (payload.notification && payload.notification.body) || "",
-    icon: "./icon-192.png",
-    badge: "./icon-192.png"
+messaging.onBackgroundMessage(function(payload) {
+  const notificationTitle = payload.notification?.title || "Shank-O-Meter Update";
+  const notificationOptions = {
+    body: payload.notification?.body || "There was an update to the Shank-O-Meter.",
+    icon: "/icon-192.png",
+    badge: "/icon-192.png"
   };
-  self.registration.showNotification(title, options);
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
