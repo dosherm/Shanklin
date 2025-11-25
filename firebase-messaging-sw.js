@@ -12,12 +12,13 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(function(payload) {
-  const notificationTitle = payload.notification?.title || "Shank-O-Meter Update";
-  const notificationOptions = {
-    body: payload.notification?.body || "There was an update to the Shank-O-Meter.",
-    icon: "/icon-192.png",
-    badge: "/icon-192.png"
+// Show notifications when the PWA is closed/backgrounded
+messaging.onBackgroundMessage((payload) => {
+  const title = payload.notification?.title || "Shank‑O‑Meter Update";
+  const options = {
+    body: payload.notification?.body || "",
+    icon: "./icon-192.png",
+    badge: "./icon-192.png"
   };
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  self.registration.showNotification(title, options);
 });
