@@ -11,14 +11,8 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
-
-// Show notifications when the PWA is closed/backgrounded
 messaging.onBackgroundMessage((payload) => {
   const title = payload.notification?.title || "Shank‑O‑Meter Update";
-  const options = {
-    body: payload.notification?.body || "",
-    icon: "./icon-192.png",
-    badge: "./icon-192.png"
-  };
+  const options = { body: payload.notification?.body || "", icon: "./icon-192.png", badge: "./icon-192.png" };
   self.registration.showNotification(title, options);
 });
