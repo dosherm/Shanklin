@@ -1,30 +1,18 @@
-const CACHE = "shanklin-pwa-msg-v1";
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./style.css",
-  "./app.js",
-  "./manifest.json",
-  "./icon-192.png",
-  "./icon-512.png",
-  "./firebase-messaging-sw.js"
-];
-self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
-  self.skipWaiting();
+importScripts('https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "AIzaSyBfqqXgrLGaRzY3ECH0FkckuSWlMgRgAWQ",
+  authDomain: "shanklin-5d9d8.firebaseapp.com",
+  projectId: "shanklin-5d9d8",
+  storageBucket: "shanklin-5d9d8.firebasestorage.app",
+  messagingSenderId: "294015099276",
+  appId: "1:294015099276:web:5c91556f85d46c310df6a9"
 });
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
-  event.waitUntil(
-    self.clients.matchAll({ type: "window" }).then((clients) => {
-      clients.forEach((client) => client.navigate(client.url));
-    })
-  );
-});
-self.addEventListener("fetch", (event) => {
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
+
+const messaging = firebase.messaging();
+messaging.onBackgroundMessage((payload) => {
+  const title = payload.notification?.title || "Shank‑O‑Meter Update";
+  const options = { body: payload.notification?.body || "", icon: "./icon-192.png", badge: "./icon-192.png" };
+  self.registration.showNotification(title, options);
 });
