@@ -94,8 +94,11 @@ onSnapshot(doc(db, "settings", "lastAccident"), (snap) => {
     if (Notification.permission !== "granted") return;
     const messaging = getMessaging(app);
     const vapidKey = "BC16SkEdTJH-78uCwACzQywLJVwJDIMhAFlVm6R3Tp2s9n3zMxP3muCdbAu72hduZAUP0uvUWrW3AkrCpcKvk7w";
+    console.log("⚙️ Requesting FCM token...");
     const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: registration });
-    if (token) await setDoc(doc(db, "fcmTokens", token), { created: new Date().toISOString() }, { merge: true });
+    console.log("📡 FCM token received:", token);
+    if (token) console.log("📝 Saving FCM token to Firestore...");
+    await setDoc(doc(db, "fcmTokens", token), { created: new Date().toISOString() }, { merge: true });
     onMessage(messaging, (payload) => {
       const title = payload.notification?.title || "Shank‑O‑Meter Update";
       const options = { body: payload.notification?.body || "", icon: "./icon-192.png" };
