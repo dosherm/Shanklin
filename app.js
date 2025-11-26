@@ -32,19 +32,10 @@ const confirmYes = document.getElementById("confirmYes");
 const notifyContainer = document.getElementById("notifyContainer");
 const enableNotificationsBtn = document.getElementById("enableNotifications");
 
-function updateNotificationButtonVisibility() {
-  const perm = Notification.permission;
-  if (notifyContainer) {
-    notifyContainer.style.display = perm === "granted" ? "none" : "block";
-  }
-}
-
-// Run visibility check immediately
-updateNotificationButtonVisibility();
-
 /* ─────────────────────────────────────────────
-   DEVICE ID (stable per device)
+   Device identity & local registration state
 ────────────────────────────────────────────── */
+
 function getDeviceId() {
   let id = localStorage.getItem("deviceId");
   if (!id) {
@@ -56,9 +47,47 @@ function getDeviceId() {
 
 const deviceId = getDeviceId();
 
+function getLocalToken() {
+  return localStorage.getItem("fcmToken") || null;
+}
+
+function setLocalToken(token) {
+  if (token) {
+    localStorage.setItem("fcmToken", token);
+  } else {
+    localStorage.removeItem("fcmToken");
+  }
+}
+
+/**
+ * Button visibility rule (your choice A):
+ * Show the button if:
+ *  - permission is NOT "granted" OR
+ *  - this device does NOT have a stored token
+ * Hide the button only if:
+ *  - permission is "granted" AND
+ *  - token exists locally
+ */
+function updateNotificationButtonVisibility() {
+  if (!notifyContainer) return;
+
+  const perm = Notification.permission;
+  const hasLocalToken = !!getLocalToken();
+
+  if (perm === "granted" && hasLocalToken) {
+    notifyContainer.style.display = "none";
+  } else {
+    notifyContainer.style.display = "block";
+  }
+}
+
+// Initial check at page load
+updateNotificationButtonVisibility();
+
 /* ─────────────────────────────────────────────
    Days & Display Logic
 ────────────────────────────────────────────── */
+
 function daysBetween(fromISO, to = new Date()) {
   const from = new Date(fromISO);
   const diff = to - from;
@@ -91,6 +120,7 @@ async function setLastAccident(date) {
 /* ─────────────────────────────────────────────
    Modal Logic
 ────────────────────────────────────────────── */
+
 function openModal() {
   modalBackdrop.classList.remove("hidden");
   requestAnimationFrame(() => modalBackdrop.classList.add("show"));
@@ -139,6 +169,7 @@ window.addEventListener("keydown", (e) => {
 /* ─────────────────────────────────────────────
    Live Firestore Updates
 ────────────────────────────────────────────── */
+
 onSnapshot(doc(db, "settings", "lastAccident"), (snap) => {
   if (!snap.exists()) return;
   const iso = snap.data().timestamp;
@@ -148,19 +179,22 @@ onSnapshot(doc(db, "settings", "lastAccident"), (snap) => {
 /* ─────────────────────────────────────────────
    Messaging (iOS-safe, one-token-per-device)
 ────────────────────────────────────────────── */
+
 if (enableNotificationsBtn) {
   enableNotificationsBtn.addEventListener("click", async () => {
     try {
       console.log("🔔 Requesting notification permission…");
 
       const perm = await Notification.requestPermission();
-      updateNotificationButtonVisibility();
 
+      // If permission is not granted, update UI and bail.
       if (perm !== "granted") {
+        updateNotificationButtonVisibility();
         alert("Notifications were not enabled. You can try again.");
         return;
       }
 
+      // At this point, permission is granted. Now we register SW + get token.
       const registration = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
 
       if (!(await isSupported())) {
@@ -182,7 +216,10 @@ if (enableNotificationsBtn) {
       console.log("📡 FCM token received:", token);
 
       if (token) {
-        // Save under stable device ID → prevents duplicates
+        // Save token locally so we know this device is registered.
+        setLocalToken(token);
+
+        // Save under stable device ID → one token per device.
         await setDoc(
           doc(db, "fcmTokens", deviceId),
           {
@@ -193,12 +230,21 @@ if (enableNotificationsBtn) {
         );
 
         alert("✅ Notifications enabled!");
+      } else {
+        // Token failed; ensure local state reflects "not registered"
+        setLocalToken(null);
+        alert("⚠️ Could not get a notification token.");
       }
 
-      // Foreground listener removed to avoid double notifications
+      // Update visibility *after* registration attempt.
+      updateNotificationButtonVisibility();
+
+      // Foreground listener intentionally omitted to avoid duplicate notifications.
 
     } catch (err) {
       console.warn("Notification setup failed:", err);
+      setLocalToken(null);
+      updateNotificationButtonVisibility();
       alert("⚠️ Unable to enable notifications. Check console.");
     }
   });
@@ -207,6 +253,7 @@ if (enableNotificationsBtn) {
 /* ─────────────────────────────────────────────
    Initial Load
 ────────────────────────────────────────────── */
+
 (async function init() {
   const lastISO = await getLastAccident();
   if (lastISO) renderDays(daysBetween(lastISO));
