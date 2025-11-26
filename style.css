@@ -108,3 +108,8 @@ svg {
   margin: 0 auto;    /* Centers it */
   flex-shrink: 0;    /* <-- CRITICAL: prevents collapse */
 }
+.wrap > svg {
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
