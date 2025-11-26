@@ -100,3 +100,11 @@ html, body {
 #resetBtn {
   text-align: right;
 }
+svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 418px;  /* Natural width of your SVG viewBox */
+  margin: 0 auto;    /* Centers it */
+  flex-shrink: 0;    /* <-- CRITICAL: prevents collapse */
+}
