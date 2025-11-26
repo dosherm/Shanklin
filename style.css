@@ -66,3 +66,37 @@ html, body {
   z-index: 1100;
 }
 .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+/* Header Title */
+.shank-header {
+  text-align: center;
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #f5d76e;
+  margin-top: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+/* Control Bar Beneath SVG */
+.control-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;         /* <-- allows stacking only when needed */
+  margin-top: 1.5rem;
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+/* When stacked (very small screens), center buttons */
+.control-bar > * {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+#notifyContainer {
+  text-align: left;
+}
+
+#resetBtn {
+  text-align: right;
+}
