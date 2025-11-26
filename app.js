@@ -39,9 +39,26 @@ function updateNotificationButtonVisibility() {
   }
 }
 
-// Initial check at page load
+// Run visibility check immediately
 updateNotificationButtonVisibility();
 
+/* ─────────────────────────────────────────────
+   DEVICE ID (stable per device)
+────────────────────────────────────────────── */
+function getDeviceId() {
+  let id = localStorage.getItem("deviceId");
+  if (!id) {
+    id = "device_" + Math.random().toString(16).slice(2, 10);
+    localStorage.setItem("deviceId", id);
+  }
+  return id;
+}
+
+const deviceId = getDeviceId();
+
+/* ─────────────────────────────────────────────
+   Days & Display Logic
+────────────────────────────────────────────── */
 function daysBetween(fromISO, to = new Date()) {
   const from = new Date(fromISO);
   const diff = to - from;
@@ -71,7 +88,9 @@ async function setLastAccident(date) {
   await setDoc(ref, { timestamp: date.toISOString() });
 }
 
-// Modal logic
+/* ─────────────────────────────────────────────
+   Modal Logic
+────────────────────────────────────────────── */
 function openModal() {
   modalBackdrop.classList.remove("hidden");
   requestAnimationFrame(() => modalBackdrop.classList.add("show"));
@@ -117,14 +136,18 @@ window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeModal();
 });
 
-// Live Firestore updates
+/* ─────────────────────────────────────────────
+   Live Firestore Updates
+────────────────────────────────────────────── */
 onSnapshot(doc(db, "settings", "lastAccident"), (snap) => {
   if (!snap.exists()) return;
   const iso = snap.data().timestamp;
   renderDays(daysBetween(iso));
 });
 
-// Messaging (iOS safe, single-notification mode)
+/* ─────────────────────────────────────────────
+   Messaging (iOS-safe, one-token-per-device)
+────────────────────────────────────────────── */
 if (enableNotificationsBtn) {
   enableNotificationsBtn.addEventListener("click", async () => {
     try {
@@ -153,16 +176,18 @@ if (enableNotificationsBtn) {
 
       const token = await getToken(messaging, {
         vapidKey,
-        serviceWorkerRegistration: registration,
+        serviceWorkerRegistration: registration
       });
 
       console.log("📡 FCM token received:", token);
 
       if (token) {
+        // Save under stable device ID → prevents duplicates
         await setDoc(
-          doc(db, "fcmTokens", token),
+          doc(db, "fcmTokens", deviceId),
           {
-            created: new Date().toISOString(),
+            token,
+            updated: new Date().toISOString()
           },
           { merge: true }
         );
@@ -170,7 +195,7 @@ if (enableNotificationsBtn) {
         alert("✅ Notifications enabled!");
       }
 
-      // ❗ Foreground onMessage handler REMOVED to prevent duplicate notifications
+      // Foreground listener removed to avoid double notifications
 
     } catch (err) {
       console.warn("Notification setup failed:", err);
@@ -179,7 +204,9 @@ if (enableNotificationsBtn) {
   });
 }
 
-// Initial load
+/* ─────────────────────────────────────────────
+   Initial Load
+────────────────────────────────────────────── */
 (async function init() {
   const lastISO = await getLastAccident();
   if (lastISO) renderDays(daysBetween(lastISO));
